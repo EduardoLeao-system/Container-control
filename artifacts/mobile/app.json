@@ -18,7 +18,14 @@
     },
     "android": {},
     "web": {
-      "favicon": "./assets/images/icon.png"
+      "favicon": "./assets/images/icon.png",
+      "name": "Cautela de Movimentação de Container",
+      "shortName": "Cautela Container",
+      "description": "Sistema de registro e controle de cautelas de movimentação de contêineres. Gerencie origens, destinos, transportadores e status de cada movimentação com facilidade.",
+      "lang": "pt-BR",
+      "themeColor": "#1a2361",
+      "backgroundColor": "#F5F6FA",
+      "bundler": "metro"
     },
     "plugins": [
       [
