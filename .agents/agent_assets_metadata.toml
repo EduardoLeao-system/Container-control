@@ -1,0 +1,8 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "TVqUxblXTmgnNU08bO3Xb"
+uri = "file://artifacts/mobile/assets/images/icon.png"
+type = "image"
+title = "cautela container icon"
