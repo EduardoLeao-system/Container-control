@@ -1,21 +1,21 @@
-import { Feather } from "@expo/vector-icons";
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
+import type { LucideIcon } from "lucide-react-native";
 import { useColors } from "@/hooks/useColors";
 
 interface StatCardProps {
   label: string;
   value: number;
-  icon: keyof typeof Feather.glyphMap;
+  icon: LucideIcon;
   color: string;
 }
 
-export function StatCard({ label, value, icon, color }: StatCardProps) {
+export function StatCard({ label, value, icon: Icon, color }: StatCardProps) {
   const colors = useColors();
   return (
     <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
       <View style={[styles.iconWrap, { backgroundColor: color + "18" }]}>
-        <Feather name={icon} size={20} color={color} />
+        <Icon size={20} color={color} />
       </View>
       <Text style={[styles.value, { color: colors.foreground }]}>{value}</Text>
       <Text style={[styles.label, { color: colors.mutedForeground }]}>{label}</Text>

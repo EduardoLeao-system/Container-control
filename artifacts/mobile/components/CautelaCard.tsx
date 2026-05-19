@@ -1,4 +1,4 @@
-import { Feather } from "@expo/vector-icons";
+import { Box, ChevronRight } from "lucide-react-native";
 import { router } from "expo-router";
 import React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
@@ -31,7 +31,7 @@ export function CautelaCard({ cautela }: CautelaCardProps) {
       <View style={styles.row}>
         <View style={styles.left}>
           <View style={[styles.iconWrap, { backgroundColor: colors.primary + "14" }]}>
-            <Feather name="box" size={20} color={colors.primary} />
+            <Box size={20} color={colors.primary} />
           </View>
           <View style={styles.info}>
             <Text style={[styles.numero, { color: colors.foreground }]}>
@@ -47,7 +47,7 @@ export function CautelaCard({ cautela }: CautelaCardProps) {
           <View style={[styles.badge, { backgroundColor: color + "20" }]}>
             <Text style={[styles.badgeText, { color }]}>{label}</Text>
           </View>
-          <Feather name="chevron-right" size={16} color={colors.mutedForeground} />
+          <ChevronRight size={16} color={colors.mutedForeground} />
         </View>
       </View>
     </Pressable>

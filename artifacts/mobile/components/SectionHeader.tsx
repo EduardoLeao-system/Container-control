@@ -19,10 +19,10 @@ export function SectionHeader({ title, subtitle }: SectionHeaderProps) {
 
 const styles = StyleSheet.create({
   wrap: {
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    marginBottom: 14,
-    marginHorizontal: -16,
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    marginBottom: 10,
+    marginHorizontal: -12,
   },
   title: {
     fontSize: 11,

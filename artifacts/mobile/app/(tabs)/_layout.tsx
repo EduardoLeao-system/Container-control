@@ -3,7 +3,7 @@ import { isLiquidGlassAvailable } from "expo-glass-effect";
 import { Tabs } from "expo-router";
 import { Icon, Label, NativeTabs } from "expo-router/unstable-native-tabs";
 import { SymbolView } from "expo-symbols";
-import { Feather } from "@expo/vector-icons";
+import { Home, List, PlusCircle } from "lucide-react-native";
 import React from "react";
 import { Platform, StyleSheet, View, useColorScheme } from "react-native";
 
@@ -74,7 +74,7 @@ function ClassicTabLayout() {
             isIOS ? (
               <SymbolView name="house" tintColor={color} size={22} />
             ) : (
-              <Feather name="home" size={22} color={color} />
+              <Home size={22} color={color} />
             ),
         }}
       />
@@ -86,7 +86,7 @@ function ClassicTabLayout() {
             isIOS ? (
               <SymbolView name="plus.circle" tintColor={color} size={22} />
             ) : (
-              <Feather name="plus-circle" size={22} color={color} />
+              <PlusCircle size={22} color={color} />
             ),
         }}
       />
@@ -98,7 +98,7 @@ function ClassicTabLayout() {
             isIOS ? (
               <SymbolView name="list.bullet" tintColor={color} size={22} />
             ) : (
-              <Feather name="list" size={22} color={color} />
+              <List size={22} color={color} />
             ),
         }}
       />

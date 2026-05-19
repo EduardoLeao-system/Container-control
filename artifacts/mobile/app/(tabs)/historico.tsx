@@ -1,4 +1,4 @@
-import { Feather } from "@expo/vector-icons";
+import { Inbox, Plus, Search, X } from "lucide-react-native";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import {
@@ -30,7 +30,7 @@ export default function HistoricoScreen() {
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<StatusCautela | "todos">("todos");
 
-  const topPad = Platform.OS === "web" ? 67 : insets.top;
+  const topPad = Platform.OS === "web" ? 0 : insets.top;
   const botPad = Platform.OS === "web" ? 34 : 0;
 
   const filtered = cauteias.filter((c) => {
@@ -58,12 +58,12 @@ export default function HistoricoScreen() {
           style={styles.addBtn}
           onPress={() => router.push("/(tabs)/nova-cautela")}
         >
-          <Feather name="plus" size={22} color="#fff" />
+          <Plus size={22} color="#fff" />
         </Pressable>
       </View>
 
       <View style={[styles.searchWrap, { backgroundColor: colors.card, borderColor: colors.border }]}>
-        <Feather name="search" size={16} color={colors.mutedForeground} />
+        <Search size={16} color={colors.mutedForeground} />
         <TextInput
           style={[styles.searchInput, { color: colors.foreground }]}
           placeholder="Pesquisar cautela..."
@@ -73,7 +73,7 @@ export default function HistoricoScreen() {
         />
         {search.length > 0 && (
           <Pressable onPress={() => setSearch("")}>
-            <Feather name="x" size={16} color={colors.mutedForeground} />
+            <X size={16} color={colors.mutedForeground} />
           </Pressable>
         )}
       </View>
@@ -112,7 +112,7 @@ export default function HistoricoScreen() {
         renderItem={({ item }) => <CautelaCard cautela={item} />}
         ListEmptyComponent={
           <View style={[styles.empty, { backgroundColor: colors.card, borderColor: colors.border }]}>
-            <Feather name="inbox" size={36} color={colors.mutedForeground} />
+            <Inbox size={36} color={colors.mutedForeground} />
             <Text style={[styles.emptyTitle, { color: colors.foreground }]}>
               {search || filter !== "todos" ? "Nenhum resultado" : "Sem movimentações"}
             </Text>

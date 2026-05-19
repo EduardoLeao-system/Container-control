@@ -29,19 +29,19 @@ export function FormField({ label, required, style, ...props }: FormFieldProps) 
 }
 
 const styles = StyleSheet.create({
-  wrap: { marginBottom: 14 },
+  wrap: { marginBottom: 10 },
   label: {
-    fontSize: 12,
+    fontSize: 11,
     fontFamily: "Inter_500Medium",
-    marginBottom: 6,
+    marginBottom: 4,
     textTransform: "uppercase",
     letterSpacing: 0.4,
   },
   input: {
     borderWidth: 1,
-    borderRadius: 10,
-    paddingHorizontal: 14,
-    paddingVertical: 11,
+    borderRadius: 9,
+    paddingHorizontal: 12,
+    paddingVertical: 9,
     fontSize: 14,
     fontFamily: "Inter_400Regular",
   },

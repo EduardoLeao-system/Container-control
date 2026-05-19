@@ -1,8 +1,9 @@
-import { Feather } from "@expo/vector-icons";
+import { ArrowLeft, CheckCircle, FileText, XCircle } from "lucide-react-native";
 import * as Haptics from "expo-haptics";
 import { router, useLocalSearchParams } from "expo-router";
-import React from "react";
+import React, { useState } from "react";
 import {
+  ActivityIndicator,
   Alert,
   Platform,
   Pressable,
@@ -15,6 +16,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import type { StatusCautela } from "@/contexts/CautelaContext";
 import { useCautela } from "@/contexts/CautelaContext";
 import { useColors } from "@/hooks/useColors";
+import { gerarECompartilharPDF } from "@/lib/generateCautelaPDF";
 
 const STATUS_CONFIG: Record<StatusCautela, { label: string; color: string; icon: string }> = {
   pendente: { label: "Pendente", color: "#f59e0b", icon: "clock" },
@@ -52,7 +54,7 @@ export default function CautelaDetailScreen() {
   const { getCautela, updateStatus } = useCautela();
   const cautela = getCautela(id);
 
-  const topPad = Platform.OS === "web" ? 67 : insets.top;
+  const topPad = Platform.OS === "web" ? 0 : insets.top;
   const botPad = Platform.OS === "web" ? 34 : 0;
 
   if (!cautela) {
@@ -66,19 +68,37 @@ export default function CautelaDetailScreen() {
   }
 
   const { label, color } = STATUS_CONFIG[cautela.status];
+  const [generatingPDF, setGeneratingPDF] = useState(false);
+
+  async function handleGerarPDF() {
+    setGeneratingPDF(true);
+    try {
+      await gerarECompartilharPDF(cautela!);
+    } catch {
+      Alert.alert("Erro", "Não foi possível gerar o PDF. Tente novamente.");
+    } finally {
+      setGeneratingPDF(false);
+    }
+  }
 
   function handleStatus(status: StatusCautela) {
     const msg = status === "concluida" ? "Marcar como concluída?" : "Cancelar esta cautela?";
+
+    const execute = () => {
+      updateStatus(cautela!.id, status);
+      if (Platform.OS !== "web") {
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      }
+    };
+
+    if (Platform.OS === "web") {
+      if (window.confirm(msg)) execute();
+      return;
+    }
+
     Alert.alert("Confirmar", msg, [
       { text: "Não", style: "cancel" },
-      {
-        text: "Sim",
-        style: status === "cancelada" ? "destructive" : "default",
-        onPress: () => {
-          updateStatus(cautela!.id, status);
-          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-        },
-      },
+      { text: "Sim", style: status === "cancelada" ? "destructive" : "default", onPress: execute },
     ]);
   }
 
@@ -86,7 +106,7 @@ export default function CautelaDetailScreen() {
     <View style={[styles.root, { backgroundColor: colors.background }]}>
       <View style={[styles.header, { backgroundColor: colors.primary, paddingTop: topPad + 16 }]}>
         <Pressable style={styles.backBtn} onPress={() => router.back()}>
-          <Feather name="arrow-left" size={20} color="#fff" />
+          <ArrowLeft size={20} color="#fff" />
         </Pressable>
         <View style={styles.headerCenter}>
           <Text style={styles.headerTitle}>#{cautela.numeroControle}</Text>
@@ -94,7 +114,11 @@ export default function CautelaDetailScreen() {
             <Text style={[styles.badgeText, { color }]}>{label}</Text>
           </View>
         </View>
-        <View style={{ width: 36 }} />
+        <Pressable style={styles.backBtn} onPress={handleGerarPDF} disabled={generatingPDF}>
+          {generatingPDF
+            ? <ActivityIndicator size="small" color="#fff" />
+            : <FileText size={20} color="#fff" />}
+        </Pressable>
       </View>
 
       <ScrollView
@@ -143,18 +167,33 @@ export default function CautelaDetailScreen() {
               style={[styles.actionBtn, { backgroundColor: "#22c55e" }]}
               onPress={() => handleStatus("concluida")}
             >
-              <Feather name="check-circle" size={18} color="#fff" />
+              <CheckCircle size={18} color="#fff" />
               <Text style={styles.actionText}>Marcar Concluída</Text>
             </Pressable>
             <Pressable
               style={[styles.actionBtn, { backgroundColor: "#ef4444" }]}
               onPress={() => handleStatus("cancelada")}
             >
-              <Feather name="x-circle" size={18} color="#fff" />
+              <XCircle size={18} color="#fff" />
               <Text style={styles.actionText}>Cancelar</Text>
             </Pressable>
           </View>
         )}
+
+        <Pressable
+          style={[styles.actionBtn, styles.pdfBtn]}
+          onPress={handleGerarPDF}
+          disabled={generatingPDF}
+        >
+          {generatingPDF ? (
+            <ActivityIndicator size="small" color="#1a2361" />
+          ) : (
+            <FileText size={18} color="#1a2361" />
+          )}
+          <Text style={styles.pdfBtnText}>
+            {generatingPDF ? "Gerando PDF…" : "Gerar / Imprimir PDF"}
+          </Text>
+        </Pressable>
       </ScrollView>
     </View>
   );
@@ -241,5 +280,15 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontFamily: "Inter_700Bold",
     color: "#fff",
+  },
+  pdfBtn: {
+    backgroundColor: "#EEF0FB",
+    borderWidth: 1.5,
+    borderColor: "#1a2361",
+  },
+  pdfBtnText: {
+    fontSize: 15,
+    fontFamily: "Inter_700Bold",
+    color: "#1a2361",
   },
 });

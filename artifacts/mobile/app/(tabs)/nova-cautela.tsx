@@ -1,7 +1,7 @@
-import { Feather } from "@expo/vector-icons";
+import { Package, Save, Square } from "lucide-react-native";
 import * as Haptics from "expo-haptics";
 import { router } from "expo-router";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
   Alert,
   Platform,
@@ -14,8 +14,10 @@ import {
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { DateField } from "@/components/DateField";
 import { FormField } from "@/components/FormField";
 import { SectionHeader } from "@/components/SectionHeader";
+import { TimeField } from "@/components/TimeField";
 import type { TipoCabinete } from "@/contexts/CautelaContext";
 import { useCautela } from "@/contexts/CautelaContext";
 import { useColors } from "@/hooks/useColors";
@@ -23,11 +25,19 @@ import { useColors } from "@/hooks/useColors";
 export default function NovaCautelaScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
-  const { addCautela } = useCautela();
-  const topPad = Platform.OS === "web" ? 67 : insets.top;
+  const { cauteias, addCautela } = useCautela();
+  const topPad = Platform.OS === "web" ? 0 : insets.top;
   const botPad = Platform.OS === "web" ? 34 : 0;
 
-  const [numeroControle, setNumeroControle] = useState("");
+  // Gera número de controle automático: NNN/AAAA
+  const numeroControle = useMemo(() => {
+    const year = new Date().getFullYear();
+    const nums = cauteias
+      .map((c) => parseInt(c.numeroControle?.split("/")[0] ?? "0"))
+      .filter((n) => !isNaN(n));
+    const next = nums.length > 0 ? Math.max(...nums) + 1 : 1;
+    return `${String(next).padStart(3, "0")}/${year}`;
+  }, [cauteias]);
   const [dataMov, setDataMov] = useState("");
   const [origemLocal, setOrigemLocal] = useState("");
   const [booking, setBooking] = useState("");
@@ -93,7 +103,7 @@ export default function NovaCautelaScreen() {
           <Text style={styles.headerSub}>Movimentação de Contêiner</Text>
         </View>
         <Pressable style={styles.saveBtn} onPress={handleSalvar}>
-          <Feather name="save" size={18} color="#fff" />
+          <Save size={18} color="#fff" />
           <Text style={styles.saveBtnText}>Salvar</Text>
         </Pressable>
       </View>
@@ -106,18 +116,16 @@ export default function NovaCautelaScreen() {
       >
         <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
           <SectionHeader title="Identificação" />
-          <FormField
-            label="Nº de Controle"
-            required
-            value={numeroControle}
-            onChangeText={setNumeroControle}
-            placeholder="Ex: 001/2026"
-          />
-          <FormField
+          <View style={styles.ctrlRow}>
+            <Text style={[styles.ctrlLabel, { color: colors.mutedForeground }]}>Nº DE CONTROLE</Text>
+            <Text style={[styles.ctrlValue, { backgroundColor: colors.muted, color: colors.primary }]}>
+              {numeroControle}
+            </Text>
+          </View>
+          <DateField
             label="Data da Movimentação"
             value={dataMov}
-            onChangeText={setDataMov}
-            placeholder="DD/MM/AAAA"
+            onChange={setDataMov}
           />
         </View>
 
@@ -137,19 +145,17 @@ export default function NovaCautelaScreen() {
           />
           <View style={styles.row}>
             <View style={styles.half}>
-              <FormField
+              <DateField
                 label="Data"
                 value={origemData}
-                onChangeText={setOrigemData}
-                placeholder="DD/MM/AAAA"
+                onChange={setOrigemData}
               />
             </View>
             <View style={styles.half}>
-              <FormField
+              <TimeField
                 label="Horário"
                 value={origemHorario}
-                onChangeText={setOrigemHorario}
-                placeholder="HH:MM"
+                onChange={setOrigemHorario}
               />
             </View>
           </View>
@@ -193,19 +199,17 @@ export default function NovaCautelaScreen() {
           />
           <View style={styles.row}>
             <View style={styles.half}>
-              <FormField
+              <DateField
                 label="Data"
                 value={destinoData}
-                onChangeText={setDestinoData}
-                placeholder="DD/MM/AAAA"
+                onChange={setDestinoData}
               />
             </View>
             <View style={styles.half}>
-              <FormField
+              <TimeField
                 label="Horário"
                 value={destinoHorario}
-                onChangeText={setDestinoHorario}
-                placeholder="HH:MM"
+                onChange={setDestinoHorario}
               />
             </View>
           </View>
@@ -266,11 +270,9 @@ export default function NovaCautelaScreen() {
                 onPress={() => setTipoCabinete(tipo)}
                 activeOpacity={0.8}
               >
-                <Feather
-                  name={tipo === "cheio" ? "package" : "square"}
-                  size={16}
-                  color={tipoCabinete === tipo ? "#fff" : colors.mutedForeground}
-                />
+                {tipo === "cheio"
+                  ? <Package size={16} color={tipoCabinete === tipo ? "#fff" : colors.mutedForeground} />
+                  : <Square size={16} color={tipoCabinete === tipo ? "#fff" : colors.mutedForeground} />}
                 <Text
                   style={[
                     styles.toggleText,
@@ -323,7 +325,7 @@ export default function NovaCautelaScreen() {
           style={[styles.submitBtn, { backgroundColor: colors.primary }]}
           onPress={handleSalvar}
         >
-          <Feather name="save" size={18} color="#fff" />
+          <Save size={18} color="#fff" />
           <Text style={styles.submitText}>Salvar Cautela</Text>
         </Pressable>
       </KeyboardAwareScrollView>
@@ -366,14 +368,14 @@ const styles = StyleSheet.create({
     fontFamily: "Inter_600SemiBold",
     fontSize: 13,
   },
-  content: { padding: 16, gap: 14 },
+  content: { padding: 12, gap: 8 },
   card: {
-    borderRadius: 14,
+    borderRadius: 12,
     borderWidth: 1,
-    padding: 16,
+    padding: 12,
     overflow: "hidden",
   },
-  row: { flexDirection: "row", gap: 10 },
+  row: { flexDirection: "row", gap: 8 },
   half: { flex: 1 },
   fieldLabel: {
     fontSize: 12,
@@ -382,28 +384,50 @@ const styles = StyleSheet.create({
     textTransform: "uppercase",
     letterSpacing: 0.4,
   },
-  toggleRow: { flexDirection: "row", gap: 10, marginBottom: 14 },
+  toggleRow: { flexDirection: "row", gap: 8, marginBottom: 10 },
   toggleBtn: {
     flex: 1,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    gap: 8,
-    paddingVertical: 12,
-    borderRadius: 10,
+    gap: 6,
+    paddingVertical: 9,
+    borderRadius: 9,
     borderWidth: 1.5,
   },
   toggleText: {
     fontSize: 14,
     fontFamily: "Inter_600SemiBold",
   },
+  ctrlRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 10,
+    paddingBottom: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#E5E7EB",
+  },
+  ctrlLabel: {
+    fontSize: 11,
+    fontFamily: "Inter_500Medium",
+    letterSpacing: 0.4,
+  },
+  ctrlValue: {
+    fontSize: 17,
+    fontFamily: "Inter_700Bold",
+    paddingHorizontal: 14,
+    paddingVertical: 5,
+    borderRadius: 8,
+    overflow: "hidden",
+  },
   submitBtn: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    gap: 10,
-    paddingVertical: 16,
-    borderRadius: 13,
+    gap: 8,
+    paddingVertical: 14,
+    borderRadius: 11,
   },
   submitText: {
     fontSize: 16,

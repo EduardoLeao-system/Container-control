@@ -10,6 +10,8 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: cautelas
+    description: Operações de Cautela de Container
 paths:
   /healthz:
     get:
@@ -24,6 +26,128 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /cautelas:
+    get:
+      operationId: listCautelas
+      tags: [cautelas]
+      summary: Listar cautelas
+      description: Retorna todas as cautelas ordenadas por data de criação (mais recentes primeiro)
+      responses:
+        "200":
+          description: Lista de cautelas
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Cautela"
+    post:
+      operationId: createCautela
+      tags: [cautelas]
+      summary: Criar cautela
+      description: Cria uma nova cautela de container
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCautelaInput"
+      responses:
+        "201":
+          description: Cautela criada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Cautela"
+        "400":
+          description: Dados inválidos
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationError"
+
+  /cautelas/{id}:
+    get:
+      operationId: getCautela
+      tags: [cautelas]
+      summary: Buscar cautela por ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Cautela encontrada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Cautela"
+        "404":
+          description: Cautela não encontrada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      operationId: deleteCautela
+      tags: [cautelas]
+      summary: Excluir cautela
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Cautela excluída
+        "404":
+          description: Cautela não encontrada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /cautelas/{id}/status:
+    patch:
+      operationId: updateCautelaStatus
+      tags: [cautelas]
+      summary: Atualizar status da cautela
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateStatusInput"
+      responses:
+        "200":
+          description: Status atualizado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Cautela"
+        "400":
+          description: Status inválido
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationError"
+        "404":
+          description: Cautela não encontrada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +158,178 @@ components:
       required:
         - status
 
+    StatusCautela:
+      type: string
+      enum: [pendente, concluida, cancelada]
+
+    TipoCabinete:
+      type: string
+      enum: [cheio, vazio]
+
+    Cautela:
+      type: object
+      properties:
+        id:
+          type: string
+        numeroControle:
+          type: string
+        dataMov:
+          type: string
+        origemLocal:
+          type: string
+        booking:
+          type: string
+        origemData:
+          type: string
+        origemHorario:
+          type: string
+        armador:
+          type: string
+        pesoLiq:
+          type: string
+        lacreArmador:
+          type: string
+        obs:
+          type: string
+        destinoLocal:
+          type: string
+        destinoData:
+          type: string
+        destinoHorario:
+          type: string
+        placaCavalo:
+          type: string
+        conteiner:
+          type: string
+        tara:
+          type: string
+        notasFiscais:
+          type: string
+        pesoBruto:
+          type: string
+        tipoCabinete:
+          $ref: "#/components/schemas/TipoCabinete"
+        transportador:
+          type: string
+        motorista:
+          type: string
+        rg:
+          type: string
+        recebedor:
+          type: string
+        status:
+          $ref: "#/components/schemas/StatusCautela"
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - numeroControle
+        - dataMov
+        - origemLocal
+        - booking
+        - origemData
+        - origemHorario
+        - armador
+        - pesoLiq
+        - lacreArmador
+        - obs
+        - destinoLocal
+        - destinoData
+        - destinoHorario
+        - placaCavalo
+        - conteiner
+        - tara
+        - notasFiscais
+        - pesoBruto
+        - tipoCabinete
+        - transportador
+        - motorista
+        - rg
+        - recebedor
+        - status
+        - createdAt
+
+    CreateCautelaInput:
+      type: object
+      properties:
+        numeroControle:
+          type: string
+        dataMov:
+          type: string
+        origemLocal:
+          type: string
+        booking:
+          type: string
+        origemData:
+          type: string
+        origemHorario:
+          type: string
+        armador:
+          type: string
+        pesoLiq:
+          type: string
+        lacreArmador:
+          type: string
+        obs:
+          type: string
+        destinoLocal:
+          type: string
+        destinoData:
+          type: string
+        destinoHorario:
+          type: string
+        placaCavalo:
+          type: string
+        conteiner:
+          type: string
+        tara:
+          type: string
+        notasFiscais:
+          type: string
+        pesoBruto:
+          type: string
+        tipoCabinete:
+          $ref: "#/components/schemas/TipoCabinete"
+        transportador:
+          type: string
+        motorista:
+          type: string
+        rg:
+          type: string
+        recebedor:
+          type: string
+      required:
+        - numeroControle
+        - dataMov
+        - origemLocal
+        - destinoLocal
+        - destinoData
+        - destinoHorario
+        - placaCavalo
+        - conteiner
+        - tipoCabinete
+
+    UpdateStatusInput:
+      type: object
+      properties:
+        status:
+          $ref: "#/components/schemas/StatusCautela"
+      required:
+        - status
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
+
+    ValidationError:
+      type: object
+      properties:
+        error:
+          type: object
+      required:
+        - error
